@@ -37,12 +37,16 @@ sys.modules["langchain.text_splitter"] = m2
 
 # %%
 from utils import paddle_ocr_read_document
+from paddleocr import PaddleOCR
 
 # %%
-IMAGE_DIR = "./images"
+IMAGE_DIR = "./images/"
+
+# Initialize Spanish OCR model
+ocr = PaddleOCR(lang='es')
 
 for file in os.listdir(IMAGE_DIR):
     if os.path.isfile(IMAGE_DIR + file):
-        paddle_ocr_read_document(IMAGE_DIR + file)
+        paddle_ocr_read_document(ocr, IMAGE_DIR + file)
 
 # %%
