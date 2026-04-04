@@ -1,8 +1,8 @@
 import json
+from pathlib import Path
 from typing import Any, Dict, List
 
 from paddleocr import PaddleOCR
-from pathlib import Path
 
 
 def paddle_ocr_read_document(ocr: PaddleOCR, image_path: str) -> Dict[str, Dict[str, Any]]:
