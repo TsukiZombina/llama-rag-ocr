@@ -12,6 +12,29 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Packages
+
+# %%
+import os
+import sys
+import types
+
+# Provide old import paths expected by paddlex:
+# langchain.docstore.document -> Document
+m1 = types.ModuleType("langchain.docstore.document")
+from langchain_core.documents import Document
+
+m1.Document = Document
+sys.modules["langchain.docstore.document"] = m1
+
+# langchain.text_splitter -> RecursiveCharacterTextSplitter
+m2 = types.ModuleType("langchain.text_splitter")
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+m2.RecursiveCharacterTextSplitter = RecursiveCharacterTextSplitter
+sys.modules["langchain.text_splitter"] = m2
+
 # %%
 from utils import paddle_ocr_read_document
 
