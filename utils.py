@@ -5,7 +5,7 @@ from paddleocr import PaddleOCR
 from pathlib import Path
 
 
-def paddle_ocr_read_document(ocr: PaddleOCR, image_path: str) -> Dict[Dict[str, Any]]:
+def paddle_ocr_read_document(ocr: PaddleOCR, image_path: str) -> Dict[str, Dict[str, Any]]:
     """
     Reads and scans an image from the given path and uses PaddleOCR to extract
     the text. The extracted information is stored in the `chunks` directory.
