@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_classic.chains import RetrievalQA
 from paddleocr import PaddleOCR
 
 
@@ -57,3 +58,30 @@ def create_vector_store(text_splitter, embeddings: OllamaEmbeddings, input_path:
     vector_store = FAISS.from_documents(texts, embeddings)
 
     return vector_store
+
+
+def create_rag_chain(llm, prompt, vector_store):
+    retriever = vector_store.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 4}  # Retrieve top 4 relevant chunks
+    )
+
+    rag_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=retriever,
+        chain_type_kwargs={"prompt": prompt},
+        return_source_documents=True
+    )
+
+    return rag_chain
+
+
+def query_documents(rag_chain, question):
+    result = rag_chain({"query": question})
+
+    print(f"Question: {question}")
+    print(f"Answer: {result['result']}")
+    print(f"Sources: {len(result['source_documents'])} documents referenced")
+
+    return result

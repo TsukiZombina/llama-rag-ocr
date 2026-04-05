@@ -36,10 +36,12 @@ m2.RecursiveCharacterTextSplitter = RecursiveCharacterTextSplitter
 sys.modules["langchain.text_splitter"] = m2
 
 # %%
+from langchain_ollama import ChatOllama
 from langchain_community.embeddings import OllamaEmbeddings
+from langchain_classic.prompts import PromptTemplate
 from paddleocr import PaddleOCR
 
-from utils import create_vector_store, paddle_ocr_read_document
+from utils import create_vector_store, paddle_ocr_read_document, create_rag_chain, query_documents
 
 # %%
 IMAGE_DIR = "./images/"
@@ -66,6 +68,40 @@ text_splitter = RecursiveCharacterTextSplitter(
     separators=["", "", " ", ""]
 )
 
-kb = create_vector_store(text_splitter, embeddings, "./chunks")
+vector_store = create_vector_store(text_splitter, embeddings, "./chunks")
+
+# %% [markdown]
+# ## Create RAG chain
+
+# %%
+llm = ChatOllama(model="llama3.1", temperature=1)
+
+rag_prompt = PromptTemplate(
+    input_variables=["context", "question"],
+    template="""Use the following context to answer the question.
+Provide specific details and cite relevant information when possible.
+
+Context: {context}
+
+Question: {question}
+
+Answer: Based on the provided context, here's what I found:"""
+)
+
+rag_chain = create_rag_chain(llm, rag_prompt, vector_store)
+
+# %% [markdown]
+# ## Execute Chain
+
+# %%
+queries = [
+    "¿Qué doctores atendieron pacientes?",
+    "¿Qué medicamentos fueron suministrados?",
+    "¿Que me puedes decir de Farmacias del Ahorro?"
+]
+
+for query in queries:
+    query_documents(rag_chain, query)
+    print("-" * 50)
 
 # %%
