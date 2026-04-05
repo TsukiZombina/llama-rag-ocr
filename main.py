@@ -36,8 +36,10 @@ m2.RecursiveCharacterTextSplitter = RecursiveCharacterTextSplitter
 sys.modules["langchain.text_splitter"] = m2
 
 # %%
-from utils import paddle_ocr_read_document
+from langchain_community.embeddings import OllamaEmbeddings
 from paddleocr import PaddleOCR
+
+from utils import create_vector_store, paddle_ocr_read_document
 
 # %%
 IMAGE_DIR = "./images/"
@@ -48,5 +50,22 @@ ocr = PaddleOCR(lang='es')
 for file in os.listdir(IMAGE_DIR):
     if os.path.isfile(IMAGE_DIR + file):
         paddle_ocr_read_document(ocr, IMAGE_DIR + file)
+
+# %% [markdown]
+# ## Create Vector Store
+
+# %%
+embeddings = OllamaEmbeddings(
+    model="nomic-embed-text",
+    base_url="http://localhost:11434"
+)
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200,
+    separators=["", "", " ", ""]
+)
+
+kb = create_vector_store(text_splitter, embeddings, "./chunks")
 
 # %%
